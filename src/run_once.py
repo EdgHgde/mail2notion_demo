@@ -18,6 +18,31 @@ MIN_BODY_LEN = 120
 OVERALL_BUDGET_SEC = 180    # 전체 실행 3분 넘기면 종료
 PER_MESSAGE_BUDGET_SEC = 60 # 메일 하나 처리에 60초 넘기면 스킵
 
+_ZW_RE = re.compile(r"[\u200B-\u200F\u2028\u2029\u2060]")
+
+def _clean_text(s: str) -> str:
+    if not s:
+        return ""
+    s = _ZW_RE.sub("", s)
+    # 흔한 대시/콜론 통일
+    return (s.replace("\u2013", "-")
+             .replace("\u2014", "-")
+             .replace("\uff1a", ":")  # 풀와이드 콜론
+             .strip())
+
+# 제목에서 티커 찾기: 콜론/대시/공백/제로폭 허용
+_TICKER_RE = re.compile(r'\b(NVDA|PLTR|TSLA)\b(?:[\s:\-–—]?)', re.I)
+
+def _has_ticker_in_subject(subj: str) -> bool:
+    subj = _clean_text(subj)
+    return bool(_TICKER_RE.search(subj))
+
+# 본문에서도 보조로 탐지(Seeking Alpha 본문에 종종 '(PLTR)' '(NVDA)' 패턴 존재)
+_BODY_TICKER_RE = re.compile(r'\((NVDA|PLTR|TSLA)\)', re.I)
+def _has_ticker_in_body(body: str) -> bool:
+    body = _clean_text(body)
+    return bool(_BODY_TICKER_RE.search(body))
+
 def _strip_invisibles(s: str) -> str:
     """제로폭/제어문자 정리 + 개행 정돈"""
     if s is None:
@@ -37,7 +62,7 @@ def main():
 
     print(f"[green]GMAIL: search -> '{GMAIL_SEARCH_QUERY}'[/green]")
     # 최대 출력수 제한.
-    ids = search_messages(svc, GMAIL_SEARCH_QUERY, max_results=10)
+    ids = search_messages(svc, GMAIL_SEARCH_QUERY, max_results=20)
     print(f"[green]GMAIL: {len(ids)} message(s) found[/green]")
 
     if not ids:
@@ -76,6 +101,13 @@ def main():
 
         # raw data를 output에 markdown 형식으로 출력하는 코드
         # write_markdown(f"RAW_{make_filename(msg['id']).replace('.md','.txt')}", raw)
+
+        # ==================== 🔎 티커 필터 (제목 우선, 본문 보조) ====================
+        body_only = raw.split("\n\n", 1)[-1] if "\n\n" in raw else raw
+        if not (_has_ticker_in_subject(subject) or _has_ticker_in_body(body_only)):
+            print(f"[yellow]MSG {msg_id[:8]}: skip — target tickers not found in subject/body[/yellow]")
+            continue
+        # ===========================================================================
 
         # 날짜 후보
         try:
