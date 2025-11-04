@@ -11,7 +11,7 @@ OpenAI 모델을 이용해 마크다운 형식의 요약을 생성한 뒤,
 자동으로 Notion 데이터베이스에 업로드하는 자동화 시스템입니다.
 
 전체 구조는 다음과 같습니다:
-'''
+```
 Gmail Inbox
 ↓ (Google API)
 mail2notion_demo
@@ -25,8 +25,7 @@ mail2notion_demo
 ├── config.py         # 환경 변수 로드
 └── templates/
 └── news_prompt.txt  # LLM 프롬프트 템플릿
-'''
-
+```
 ---
 
 ## ⚙️ 설치 및 환경 구성
