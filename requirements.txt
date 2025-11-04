@@ -1,0 +1,12 @@
+google-api-python-client==2.148.0
+google-auth==2.35.0
+google-auth-oauthlib==1.2.1
+openai==1.50.2
+python-dotenv==1.0.1
+beautifulsoup4==4.12.3
+markdownify==0.13.1
+requests==2.32.3
+lxml==5.3.0
+lxml_html_clean>=0.1.1
+readability-lxml==0.8.1
+cssselect==1.2.0
