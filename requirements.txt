@@ -1,12 +1,33 @@
-google-api-python-client==2.148.0
-google-auth==2.35.0
-google-auth-oauthlib==1.2.1
-openai==1.50.2
-python-dotenv==1.0.1
-beautifulsoup4==4.12.3
-markdownify==0.13.1
-requests==2.32.3
-lxml==5.3.0
-lxml_html_clean>=0.1.1
-readability-lxml==0.8.1
-cssselect==1.2.0
+# --- Core ---
+python-dotenv>=1.0,<2
+pydantic>=2.9,<3
+pydantic-settings>=2.6,<3
+requests>=2.32,<3
+httpx>=0.27,<0.28
+python-dateutil>=2.9,<3
+tenacity>=8.3,<9
+rich>=13.9,<14
+
+# --- Parsing / Scraping ---
+beautifulsoup4>=4.12,<5
+lxml>=5.2,<6
+readability-lxml>=0.8.1,<0.9
+feedparser>=6.0,<7
+tqdm>=4.66,<5
+
+# --- Notion ---
+notion-client>=2.2,<3
+
+# --- Gmail / Google APIs ---
+google-api-python-client>=2.150,<3
+google-auth>=2.34,<3
+google-auth-httplib2>=0.2,<1
+google-auth-oauthlib>=1.2,<2
+httplib2>=0.22,<1
+
+# --- Scheduling(옵션) ---
+APScheduler>=3.10,<4
+
+# --- CLI(옵션) ---
+typer>=0.12,<1
+click>=8.1,<9

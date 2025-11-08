@@ -1,9 +1,9 @@
 # src/run_once.py
 from __future__ import annotations
-from .config import GOOGLE_CREDENTIALS_FILE, GMAIL_SEARCH_QUERY, GMAIL_PROCESSED_LABEL
+from .config import GOOGLE_CREDENTIALS_FILE, GMAIL_SEARCH_QUERY
 from .gmail_client import (
     load_creds, get_service, search_messages, get_message,
-    extract_text_from_message, add_label_processed, extract_urls_from_message, extract_email_dates
+    extract_text_from_message, extract_urls_from_message, extract_email_dates
 )
 from .datetime_utils import choose_best_date
 from .formatter import render_markdown, make_filename
@@ -175,13 +175,6 @@ def main():
 
         outpath = write_markdown(make_filename(msg_id), md)
         print(f"[green]MSG {msg_id[:8]}: saved -> {outpath}[/green]")
-
-        if GMAIL_PROCESSED_LABEL:
-            try:
-                add_label_processed(svc, msg_id, GMAIL_PROCESSED_LABEL)
-                print(f"[magenta]MSG {msg_id[:8]}: labeled {GMAIL_PROCESSED_LABEL}[/magenta]")
-            except Exception as e:
-                print(f"[yellow]MSG {msg_id[:8]}: label failed -> {e}[/yellow]")
 
         print(f"[cyan]MSG {msg_id[:8]}: end ({int(time.monotonic()-msg_start)}s)[/cyan]")
 

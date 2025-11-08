@@ -16,11 +16,12 @@ from .datetime_utils import parse_rfc2822_date
 from bs4 import BeautifulSoup
 from markdownify import markdownify as md
 from rich import print
+import datetime
 
 # =========================
 # 설정
 # =========================
-SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
+SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 TOKEN_FILE = "token.json"
 
 # 메일 본문에서 발견되는 뉴스 링크 우선 도메인 (필요시 추가)
@@ -85,7 +86,7 @@ def get_service(creds: Credentials):
 def search_messages(service, query: str, max_results: int = 20) -> List[str]:
     """
     Gmail 검색 쿼리로 메시지 ID 목록을 최신순으로 반환.
-    예: 'from:account@seekingalpha.com newer_than:1d'
+        예: 'from:account@seekingalpha.com newer_than:1d'
     """
     res = service.users().messages().list(
         userId="me", q=query, maxResults=max_results
@@ -169,23 +170,6 @@ def extract_text_from_message(service, msg: Dict) -> str:
 
     meta = f"Subject: {subj}\nFrom: {frm}\n\n"
     return meta + (plain or "(empty)")
-
-# =========================
-# 라벨 처리
-# =========================
-def add_label_processed(service, msg_id: str, label: str):
-    """처리 라벨을 생성/부착."""
-    if not label:
-        return
-    lids = service.users().labels().list(userId="me").execute().get("labels", [])
-    target = next((l for l in lids if l.get("name") == label), None)
-    if not target:
-        target = service.users().labels().create(
-            userId="me", body={"name": label}
-        ).execute()
-    service.users().messages().modify(
-        userId="me", id=msg_id, body={"addLabelIds": [target["id"]]}
-    ).execute()
 
 # =========================
 # URL 추출 (기사 링크용)
