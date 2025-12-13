@@ -8,6 +8,7 @@ from .gmail_client import (
 from .datetime_utils import choose_best_date
 from .formatter import render_markdown, make_filename
 from .io_utils import write_markdown
+from .email_sender import send_email
 import re, time, socket
 from rich import print
 
