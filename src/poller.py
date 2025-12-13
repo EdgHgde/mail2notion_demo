@@ -12,6 +12,7 @@ from .datetime_utils import choose_best_date
 from .formatter import render_markdown, make_filename
 from .io_utils import write_markdown
 from .article_fetcher import fetch_article_markdown
+from .email_sender import send_email
 
 # -------- Poller settings --------
 STATE_FILE = ".state.json"
@@ -177,6 +178,13 @@ def _process_one(svc, msg_id: str, processed_keys: set[str], state: dict) -> boo
 
             outpath = write_markdown(make_filename(f"{msg_id}_{ticker}"), md)
             print(f"MSG {msg_id[:8]}:{ticker}: saved -> {outpath}")
+
+            send_email(
+                service=svc,
+                to=["ehho0916@yonsei.ac.kr"],  # ← 나중에 구독자 리스트
+                subject=f"[EdgH] {ticker} 핵심 이슈 요약",
+                body_md=md,
+            )
 
             processed_keys.add(key)
             state["processed_keys"] = sorted(processed_keys)

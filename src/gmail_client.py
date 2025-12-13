@@ -21,7 +21,8 @@ import datetime
 # =========================
 # 설정
 # =========================
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/gmail.send",
+          "https://www.googleapis.com/auth/gmail.readonly"]
 TOKEN_FILE = "token.json"
 
 # 메일 본문에서 발견되는 뉴스 링크 우선 도메인 (필요시 추가)
