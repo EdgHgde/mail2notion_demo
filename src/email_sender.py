@@ -6,6 +6,8 @@ from email.mime.multipart import MIMEMultipart
 
 
 def send_email(service, to, subject, body_md, bcc=None):
+    if not to:
+        raise ValueError("The 'to' parameter must contain at least one recipient email address.")
     message = MIMEMultipart()
     message["To"] = ", ".join(to)
     message["Subject"] = subject

@@ -19,6 +19,9 @@ GMAIL_TO = [
     if e.strip()
 ]
 
+if not GMAIL_TO:
+    raise ValueError("GMAIL_TO environment variable must be set and contain at least one recipient email address.")
+
 GMAIL_BCC = [
     e.strip()
     for e in os.getenv("GMAIL_BCC", "").split(",")
