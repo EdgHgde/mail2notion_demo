@@ -13,6 +13,7 @@ from .formatter import render_markdown, make_filename
 from .io_utils import write_markdown
 from .article_fetcher import fetch_article_markdown
 from .email_sender import send_email
+from .config import GMAIL_TO, GMAIL_BCC
 
 # -------- Poller settings --------
 STATE_FILE = ".state.json"
@@ -181,7 +182,8 @@ def _process_one(svc, msg_id: str, processed_keys: set[str], state: dict) -> boo
 
             send_email(
                 service=svc,
-                to=["ehho0916@yonsei.ac.kr"],  # ← 나중에 구독자 리스트
+                to=GMAIL_TO,
+                bcc=GMAIL_BCC,
                 subject=f"[EdgH] {ticker} 핵심 이슈 요약",
                 body_md=md,
             )
