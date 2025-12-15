@@ -60,7 +60,7 @@ def render_markdown(raw_text: str, debug_tag: str = "") -> str:
             {"role": "user", "content": instructions},  # 템플릿
             {"role": "user", "content": raw_text},       # 실제 원문
         ],
-        temperature=0.2,
+        # temperature=0.2, (gpt-5는 기본 temperature만 사용 가능)
         top_p=1.0,
     )
     return rsp.choices[0].message.content.strip()
