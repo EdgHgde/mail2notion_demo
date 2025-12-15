@@ -11,4 +11,11 @@ def write_markdown(name: str, content: str) -> str:
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     return path
-    
+
+def extract_title_from_md(md: str) -> str:
+    if not md:
+        return "핵심 이슈 요약"
+
+    first_line = md.strip().splitlines()[0].strip()  # 📈 ... | ...
+    title_part = first_line.split("|", 1)[0].strip() # 📈 ... (날짜 제거)
+    return title_part

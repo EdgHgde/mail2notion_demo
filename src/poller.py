@@ -10,7 +10,7 @@ from .gmail_client import (
 )
 from .datetime_utils import choose_best_date
 from .formatter import render_markdown, make_filename
-from .io_utils import write_markdown
+from .io_utils import write_markdown, extract_title_from_md
 from .article_fetcher import fetch_article_markdown
 from .email_sender import send_email
 from .config import GMAIL_TO, GMAIL_BCC
@@ -174,7 +174,9 @@ def _process_one(svc, msg_id: str, processed_keys: set[str], state: dict) -> boo
             text_for_llm = composed_text
 
             print(f"MSG {msg_id[:8]}:{ticker}: LLM start")
-            md = render_markdown(text_for_llm)  # ticker 인자 없음
+            md = render_markdown(composed_text, debug_tag=msg_id[:8])
+            title_core = extract_title_from_md(md)  # 예: "📈 OpenAI X AMD 반도체 칩 딜 체결"
+            email_subject = f"[EdgH] {title_core}"
             print(f"MSG {msg_id[:8]}:{ticker}: LLM done")
 
             outpath = write_markdown(make_filename(f"{msg_id}_{ticker}"), md)
@@ -184,7 +186,7 @@ def _process_one(svc, msg_id: str, processed_keys: set[str], state: dict) -> boo
                 service=svc,
                 to=GMAIL_TO,
                 bcc=GMAIL_BCC,
-                subject=f"[EdgH] {ticker} 핵심 이슈 요약",
+                subject=email_subject,
                 body_md=md,
             )
 
