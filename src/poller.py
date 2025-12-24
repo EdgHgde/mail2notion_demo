@@ -100,6 +100,27 @@ def _save_state(st: dict) -> None:
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(st, f, ensure_ascii=False, indent=2)
 
+def is_insufficient_content(text: str) -> bool:
+    if not text:
+        return True
+
+    t = text.strip()
+
+    # 1. 전체 길이
+    if len(t) < 300:
+        return True
+
+    # 2. 문단 수 (엔터 기준)
+    if t.count("\n") < 4:
+        return True
+
+    # 3. 숫자(수치/날짜/금액) 거의 없음
+    digit_count = sum(c.isdigit() for c in t)
+    if digit_count < 3:
+        return True
+
+    return False
+
 # ---- 핵심 처리 ----
 def _process_one(svc, msg_id: str, processed_keys: set[str], state: dict) -> bool:
     """
@@ -173,8 +194,21 @@ def _process_one(svc, msg_id: str, processed_keys: set[str], state: dict) -> boo
             # text_for_llm = f"[TICKER:{ticker}]\n" + composed_text
             text_for_llm = composed_text
 
+            # ---- 원문 부족 컷 ----
+            if is_insufficient_content(composed_text):
+                print(f"[yellow]MSG {msg_id[:8]}:{ticker}: insufficient content → skip email[/yellow]")
+                return False
+
             print(f"MSG {msg_id[:8]}:{ticker}: LLM start")
             md = render_markdown(composed_text, debug_tag=msg_id[:8])
+
+            if "원문 부족" in md:
+                print(f"[yellow]MSG {msg_id[:8]}:{ticker}: detected '원문 부족' → skip email/send[/yellow]")
+                processed_keys.add(key)
+                state["processed_keys"] = sorted(processed_keys)
+                _save_state(state)
+                return False
+
             title_core = extract_title_from_md(md)  # 예: "📈 OpenAI X AMD 반도체 칩 딜 체결"
             email_subject = f"[EdgH] {title_core}"
             print(f"MSG {msg_id[:8]}:{ticker}: LLM done")
