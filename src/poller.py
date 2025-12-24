@@ -197,6 +197,9 @@ def _process_one(svc, msg_id: str, processed_keys: set[str], state: dict) -> boo
             # ---- 원문 부족 컷 ----
             if is_insufficient_content(composed_text):
                 print(f"[yellow]MSG {msg_id[:8]}:{ticker}: insufficient content → skip email[/yellow]")
+                processed_keys.add(key)
+                state["processed_keys"] = sorted(processed_keys)
+                _save_state(state)
                 return False
 
             print(f"MSG {msg_id[:8]}:{ticker}: LLM start")
